@@ -1,0 +1,15 @@
+.DS_Store
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+.swiftpm/
+build/
+Packages/
+XCBuildData/
+*.xcworkspace
+!default.xcworkspace
