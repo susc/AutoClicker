@@ -5,11 +5,16 @@ import AppKit
 
 class PositionPickerWindow: NSWindow {
     private var onComplete: ((Double, Double) -> Void)?
+    private var onCancel: (() -> Void)?
     private var globalMonitor: Any?
     private var localMonitor: Any?
     private var escapeMonitor: Any?
 
-    init(selectedX: Binding<Double>, selectedY: Binding<Double>, onComplete: @escaping () -> Void) {
+    init(
+        selectedX: Binding<Double>,
+        selectedY: Binding<Double>,
+        onComplete: @escaping () -> Void
+    ) {
         super.init(
             contentRect: NSScreen.main?.frame ?? .zero,
             styleMask: [.borderless],
@@ -24,7 +29,6 @@ class PositionPickerWindow: NSWindow {
         self.acceptsMouseMovedEvents = true
         self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
 
-        // Create bindings that will be updated
         let xBinding = selectedX
         let yBinding = selectedY
 
@@ -35,12 +39,13 @@ class PositionPickerWindow: NSWindow {
         )
         self.contentView = NSHostingView(rootView: pickerView)
 
-        // Store the bindings to update later
         self.onComplete = { x, y in
             xBinding.wrappedValue = x
             yBinding.wrappedValue = y
             onComplete()
         }
+
+        self.onCancel = onComplete
 
         setupEventMonitors()
     }
@@ -60,7 +65,7 @@ class PositionPickerWindow: NSWindow {
         // Listen for escape key
         escapeMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             if event.keyCode == 53 { // Escape
-                self?.close()
+                self?.handleCancel()
                 return nil
             }
             return event
@@ -68,10 +73,8 @@ class PositionPickerWindow: NSWindow {
     }
 
     private func handleSelection() {
-        // Get the current mouse location
         let location = NSEvent.mouseLocation
 
-        // Convert from screen coordinates (origin at bottom-left) to our coordinates
         if let screen = NSScreen.main {
             let x = location.x
             let y = screen.frame.height - location.y
@@ -81,7 +84,23 @@ class PositionPickerWindow: NSWindow {
         close()
     }
 
+    private func handleCancel() {
+        onCancel?()
+        close()
+    }
+
     override func close() {
+        removeMonitors()
+
+        orderOut(nil)
+
+        // Show main window
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            NSApp.windows.first?.makeKeyAndOrderFront(nil)
+        }
+    }
+
+    private func removeMonitors() {
         if let monitor = globalMonitor {
             NSEvent.removeMonitor(monitor)
             globalMonitor = nil
@@ -94,22 +113,13 @@ class PositionPickerWindow: NSWindow {
             NSEvent.removeMonitor(monitor)
             escapeMonitor = nil
         }
-
-        orderOut(nil)
-
-        // Show main window
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            NSApp.windows.first?.makeKeyAndOrderFront(nil)
-        }
     }
 
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
 
     deinit {
-        if let monitor = globalMonitor { NSEvent.removeMonitor(monitor) }
-        if let monitor = localMonitor { NSEvent.removeMonitor(monitor) }
-        if let monitor = escapeMonitor { NSEvent.removeMonitor(monitor) }
+        removeMonitors()
     }
 }
 
@@ -120,11 +130,9 @@ struct PositionPickerView: View {
 
     var body: some View {
         ZStack {
-            // Semi-transparent overlay
             Color.black.opacity(0.5)
                 .ignoresSafeArea()
 
-            // Instructions
             VStack {
                 Text("点击屏幕选择位置")
                     .font(.system(size: 24, weight: .medium))
