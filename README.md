@@ -4,9 +4,7 @@ A macOS native auto-clicker application.
 
 ## Screenshot
 
-<p align="center">
-  <img src="./AutoClicker/Resources/screenshot.png" width="400" />
-</p>
+[View Screenshot](./AutoClicker/Resources/screenshot.png)
 
 ## Features
 
