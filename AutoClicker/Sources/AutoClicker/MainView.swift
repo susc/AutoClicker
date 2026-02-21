@@ -21,11 +21,25 @@ func showPositionPickerWindow(
     }
 }
 
+// MARK: - Delayed Binding Helper
+
+func delayedBinding<T>(_ value: Binding<T>) -> Binding<T> {
+    Binding(
+        get: { value.wrappedValue },
+        set: { newValue in
+            DispatchQueue.main.async {
+                value.wrappedValue = newValue
+            }
+        }
+    )
+}
+
 // MARK: - Main View
 
 struct MainView: View {
     @EnvironmentObject var clickManager: ClickManager
     @State private var recordingMonitor: Any?
+
 
     var body: some View {
         VStack(spacing: 0) {
@@ -52,15 +66,19 @@ struct MainView: View {
         .frame(width: 400)
         .background(Color(nsColor: .windowBackgroundColor))
         .onChange(of: clickManager.isRecordingHotKey) { _, newValue in
-            if newValue {
-                startRecording()
-            } else {
-                stopRecording()
+            DispatchQueue.main.async {
+                if newValue {
+                    startRecording()
+                } else {
+                    stopRecording()
+                }
             }
         }
         .onChange(of: clickManager.isPickingPosition) { _, newValue in
-            if newValue {
-                showPositionPicker()
+            DispatchQueue.main.async {
+                if newValue {
+                    showPositionPicker()
+                }
             }
         }
     }
@@ -212,9 +230,6 @@ struct ClickSettingsCard: View {
                         TextField("", value: $clickManager.settings.clickCount, format: .number)
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 70)
-                            .onChange(of: clickManager.settings.clickCount) { _, newValue in
-                                if newValue < 0 { clickManager.settings.clickCount = 0 }
-                            }
 
                         Text("0 = 无限")
                             .font(.system(size: 11))
@@ -230,11 +245,8 @@ struct ClickSettingsCard: View {
                         TextField("", value: $clickManager.settings.clickInterval, format: .number)
                             .textFieldStyle(.roundedBorder)
                             .frame(width: 70)
-                            .onChange(of: clickManager.settings.clickInterval) { _, newValue in
-                                if newValue < 0 { clickManager.settings.clickInterval = 0 }
-                            }
 
-                        Picker("", selection: $clickManager.settings.clickIntervalUnit) {
+                        Picker("", selection: delayedBinding($clickManager.settings.clickIntervalUnit)) {
                             ForEach(ClickSettings.IntervalUnit.allCases) { unit in
                                 Text(unit.rawValue).tag(unit)
                             }
@@ -248,7 +260,7 @@ struct ClickSettingsCard: View {
 
                 // Click Button
                 RowItem(title: "点击按钮", icon: "hand.point.up") {
-                    Picker("", selection: $clickManager.settings.clickButton) {
+                    Picker("", selection: delayedBinding($clickManager.settings.clickButton)) {
                         ForEach(ClickButton.allCases) { button in
                             Text(button.rawValue).tag(button)
                         }
@@ -274,7 +286,7 @@ struct PositionSettingsCard: View {
 
             VStack(spacing: 0) {
                 RowItem(title: "模式", icon: "scope") {
-                    Picker("", selection: $clickManager.settings.positionMode) {
+                    Picker("", selection: delayedBinding($clickManager.settings.positionMode)) {
                         ForEach(PositionMode.allCases) { mode in
                             Text(mode.rawValue).tag(mode)
                         }
@@ -294,9 +306,6 @@ struct PositionSettingsCard: View {
                                 TextField("", value: $clickManager.settings.fixedX, format: .number)
                                     .textFieldStyle(.roundedBorder)
                                     .frame(width: 70)
-                                    .onChange(of: clickManager.settings.fixedX) { _, newValue in
-                                        if newValue < 0 { clickManager.settings.fixedX = 0 }
-                                    }
                             }
 
                             HStack(spacing: 4) {
@@ -306,13 +315,12 @@ struct PositionSettingsCard: View {
                                 TextField("", value: $clickManager.settings.fixedY, format: .number)
                                     .textFieldStyle(.roundedBorder)
                                     .frame(width: 70)
-                                    .onChange(of: clickManager.settings.fixedY) { _, newValue in
-                                        if newValue < 0 { clickManager.settings.fixedY = 0 }
-                                    }
                             }
 
                             Button(action: {
-                                clickManager.isPickingPosition = true
+                                DispatchQueue.main.async {
+                                    clickManager.isPickingPosition = true
+                                }
                             }) {
                                 Image(systemName: "location.fill")
                             }
@@ -347,7 +355,9 @@ struct HotkeySettingsCard: View {
                                 .foregroundColor(.blue)
 
                             Button("取消") {
-                                clickManager.isRecordingHotKey = false
+                                DispatchQueue.main.async {
+                                    clickManager.isRecordingHotKey = false
+                                }
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
@@ -362,13 +372,17 @@ struct HotkeySettingsCard: View {
                                 .cornerRadius(4)
 
                             Button("修改") {
-                                clickManager.isRecordingHotKey = true
+                                DispatchQueue.main.async {
+                                    clickManager.isRecordingHotKey = true
+                                }
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
 
                             Button("重置") {
-                                clickManager.resetHotKey()
+                                DispatchQueue.main.async {
+                                    clickManager.resetHotKey()
+                                }
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
@@ -434,7 +448,9 @@ struct BottomView: View {
                 if !clickManager.checkAccessibilityPermission() {
                     return
                 }
-                clickManager.toggleClicking()
+                DispatchQueue.main.async {
+                    clickManager.toggleClicking()
+                }
             }) {
                 HStack(spacing: 6) {
                     Image(systemName: clickManager.state == .running ? "stop.fill" : "play.fill")
