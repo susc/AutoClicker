@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 @main
 struct AutoClickerApp: App {
@@ -14,6 +15,12 @@ struct AutoClickerApp: App {
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) { }
+            CommandGroup(replacing: .toolbar) { }
+            CommandGroup(replacing: .sidebar) { }
         }
+    }
+
+    init() {
+        NSWindow.allowsAutomaticWindowTabbing = false
     }
 }

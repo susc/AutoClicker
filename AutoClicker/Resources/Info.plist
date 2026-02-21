@@ -28,5 +28,7 @@
     <string>NSApplication</string>
     <key>LSUIElement</key>
     <false/>
+    <key>NSAppleWindowsDisableTabbing</key>
+    <true/>
 </dict>
 </plist>
