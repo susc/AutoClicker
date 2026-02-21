@@ -1,33 +1,33 @@
 # AutoClicker
 
-macOS 平台的自动鼠标点击工具。
+A macOS native auto-clicker application.
 
-## 功能特性
+## Features
 
-- **自动点击** - 支持设置点击次数和点击间隔
-- **多种点击模式** - 支持左键、右键和中键点击
-- **位置选择** - 可选择当前鼠标位置或指定固定位置
-- **全局快捷键** - 支持自定义开始/停止快捷键
-- **原生体验** - 简洁的 macOS 原生界面设计
+- **Auto-clicker** - Configure click count and interval
+- **Multiple click modes** - Left, right, and middle mouse button support
+- **Position selection** - Use current mouse position or specify fixed coordinates
+- **Global hotkey** - Customizable start/stop hotkey
+- **Native UI** - Clean macOS native interface design
 
-## 系统要求
+## System Requirements
 
-- macOS 15.0 (Sequoia) 或更高版本
+- macOS 15.0 (Sequoia) or later
 
-## 使用说明
+## Usage
 
-1. 首次运行需要授予辅助功能权限 (系统设置 > 隐私与安全性 > 辅助功能)
-2. 设置点击次数 (0 表示无限)
-3. 设置点击间隔 (毫秒或秒)
-4. 选择点击按钮和位置模式
-5. 点击"开始自动点击"或使用快捷键开始/停止
+1. On first launch, grant Accessibility permission (System Settings > Privacy & Security > Accessibility)
+2. Set click count (0 for unlimited)
+3. Set click interval (milliseconds or seconds)
+4. Choose click button and position mode
+5. Click "Start Auto Click" or use the hotkey to start/stop
 
-## 快捷键
+## Hotkey
 
-- 默认: ⌘F9 (开始/停止)
-- 可在设置中自定义
+- Default: ⌘F9 (Start/Stop)
+- Customizable in settings
 
-## 构建
+## Build
 
 ```bash
 cd AutoClicker
@@ -35,6 +35,6 @@ xcodegen generate
 open AutoClicker.xcodeproj
 ```
 
-## 许可证
+## License
 
 MIT License
