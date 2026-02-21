@@ -282,6 +282,7 @@ struct PositionSettingsCard: View {
                 }
             }
             .pickerStyle(.segmented)
+            .frame(maxWidth: .infinity)
 
             // Fixed Position Inputs
             if clickManager.settings.positionMode == .fixedPosition {
