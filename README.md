@@ -2,6 +2,10 @@
 
 A macOS native auto-clicker application.
 
+## Screenshot
+
+![AutoClicker](./AutoClicker/Resources/screenshot.png)
+
 ## Features
 
 - **Auto-clicker** - Configure click count and interval
