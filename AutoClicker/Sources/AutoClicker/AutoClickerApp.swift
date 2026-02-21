@@ -9,8 +9,8 @@ struct AutoClickerApp: App {
         WindowGroup {
             MainView()
                 .environmentObject(clickManager)
-                .frame(minWidth: 380, idealWidth: 420)
         }
         .windowStyle(.hiddenTitleBar)
+        .windowResizability(.contentSize)
     }
 }

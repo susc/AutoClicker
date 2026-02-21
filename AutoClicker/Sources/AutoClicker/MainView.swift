@@ -28,26 +28,28 @@ struct MainView: View {
     @State private var recordingMonitor: Any?
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // Header with Status
-                HeaderView()
+        VStack(spacing: 0) {
+            // Header
+            HeaderView()
 
-                // Click Settings Card
-                ClickSettingsCard()
+            Divider()
 
-                // Position Settings Card
-                PositionSettingsCard()
-
-                // Hotkey Settings Card
-                HotkeySettingsCard()
-
-                // Control Button
-                ControlButton()
+            // Content
+            ScrollView {
+                VStack(spacing: 16) {
+                    ClickSettingsCard()
+                    PositionSettingsCard()
+                    HotkeySettingsCard()
+                }
+                .padding(16)
             }
-            .padding(20)
+
+            Divider()
+
+            // Bottom
+            BottomView()
         }
-        .frame(minWidth: 380, idealWidth: 420, minHeight: 480)
+        .frame(width: 400)
         .background(Color(nsColor: .windowBackgroundColor))
         .onChange(of: clickManager.isRecordingHotKey) { _, newValue in
             if newValue {
@@ -146,43 +148,39 @@ struct HeaderView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            // Status indicator
-            ZStack {
-                Circle()
-                    .fill(statusColor.opacity(0.2))
-                    .frame(width: 40, height: 40)
-
-                Circle()
-                    .fill(statusColor)
-                    .frame(width: 12, height: 12)
-            }
+            Image(systemName: "cursorarrow.click.2")
+                .font(.system(size: 24))
+                .foregroundColor(.accentColor)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(statusText)
-                    .font(.headline)
+                Text("AutoClicker")
+                    .font(.system(size: 16, weight: .semibold))
 
-                if clickManager.state == .running {
-                    Text("已点击 \(clickManager.currentClickCount) 次")
-                        .font(.caption)
+                HStack(spacing: 6) {
+                    Circle()
+                        .fill(statusColor)
+                        .frame(width: 6, height: 6)
+
+                    Text(statusText)
+                        .font(.system(size: 12))
                         .foregroundColor(.secondary)
+
+                    if clickManager.state == .running {
+                        Text("· \(clickManager.currentClickCount) 次")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                    }
                 }
             }
 
             Spacer()
-
-            // App icon placeholder
-            Image(systemName: "cursorarrow.click.2")
-                .font(.system(size: 28))
-                .foregroundColor(.secondary)
         }
         .padding(16)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .cornerRadius(12)
     }
 
     private var statusColor: Color {
         switch clickManager.state {
-        case .stopped: return .red
+        case .stopped: return .gray
         case .running: return .green
         case .paused: return .orange
         }
@@ -190,8 +188,8 @@ struct HeaderView: View {
 
     private var statusText: String {
         switch clickManager.state {
-        case .stopped: return "等待开始"
-        case .running: return "正在运行"
+        case .stopped: return "就绪"
+        case .running: return "运行中"
         case .paused: return "已暂停"
         }
     }
@@ -203,35 +201,35 @@ struct ClickSettingsCard: View {
     @EnvironmentObject var clickManager: ClickManager
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Label("点击设置", systemImage: "cursorarrow.click")
-                .font(.headline)
+                .font(.system(size: 13, weight: .semibold))
 
-            VStack(spacing: 12) {
+            VStack(spacing: 0) {
                 // Click Count
-                SettingRow(icon: "number", title: "点击次数") {
+                RowItem(title: "点击次数", icon: "number") {
                     HStack(spacing: 8) {
                         TextField("", value: $clickManager.settings.clickCount, format: .number)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 80)
+                            .frame(width: 70)
                             .onChange(of: clickManager.settings.clickCount) { _, newValue in
                                 if newValue < 0 { clickManager.settings.clickCount = 0 }
                             }
 
-                        Text("(0 = 无限)")
-                            .font(.caption)
+                        Text("0 = 无限")
+                            .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
                 }
 
-                Divider()
+                Divider().padding(.leading, 36)
 
                 // Click Interval
-                SettingRow(icon: "clock", title: "点击间隔") {
+                RowItem(title: "点击间隔", icon: "clock") {
                     HStack(spacing: 8) {
                         TextField("", value: $clickManager.settings.clickInterval, format: .number)
                             .textFieldStyle(.roundedBorder)
-                            .frame(width: 80)
+                            .frame(width: 70)
                             .onChange(of: clickManager.settings.clickInterval) { _, newValue in
                                 if newValue < 0 { clickManager.settings.clickInterval = 0 }
                             }
@@ -242,14 +240,14 @@ struct ClickSettingsCard: View {
                             }
                         }
                         .pickerStyle(.segmented)
-                        .frame(width: 100)
+                        .frame(width: 90)
                     }
                 }
 
-                Divider()
+                Divider().padding(.leading, 36)
 
                 // Click Button
-                SettingRow(icon: "hand.point.up", title: "点击按钮") {
+                RowItem(title: "点击按钮", icon: "hand.point.up") {
                     Picker("", selection: $clickManager.settings.clickButton) {
                         ForEach(ClickButton.allCases) { button in
                             Text(button.rawValue).tag(button)
@@ -258,10 +256,9 @@ struct ClickSettingsCard: View {
                     .pickerStyle(.segmented)
                 }
             }
+            .background(Color(nsColor: .controlBackgroundColor))
+            .cornerRadius(8)
         }
-        .padding(16)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .cornerRadius(12)
     }
 }
 
@@ -271,63 +268,63 @@ struct PositionSettingsCard: View {
     @EnvironmentObject var clickManager: ClickManager
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Label("位置设置", systemImage: "location")
-                .font(.headline)
+                .font(.system(size: 13, weight: .semibold))
 
-            // Position Mode Picker
-            Picker("", selection: $clickManager.settings.positionMode) {
-                ForEach(PositionMode.allCases) { mode in
-                    Text(mode.rawValue).tag(mode)
+            VStack(spacing: 0) {
+                RowItem(title: "模式", icon: "scope") {
+                    Picker("", selection: $clickManager.settings.positionMode) {
+                        ForEach(PositionMode.allCases) { mode in
+                            Text(mode.rawValue).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
+
+                if clickManager.settings.positionMode == .fixedPosition {
+                    Divider().padding(.leading, 36)
+
+                    RowItem(title: "坐标", icon: "point.topleft.down.to.point.bottomright.curvepath") {
+                        HStack(spacing: 12) {
+                            HStack(spacing: 4) {
+                                Text("X")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary)
+                                TextField("", value: $clickManager.settings.fixedX, format: .number)
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(width: 70)
+                                    .onChange(of: clickManager.settings.fixedX) { _, newValue in
+                                        if newValue < 0 { clickManager.settings.fixedX = 0 }
+                                    }
+                            }
+
+                            HStack(spacing: 4) {
+                                Text("Y")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary)
+                                TextField("", value: $clickManager.settings.fixedY, format: .number)
+                                    .textFieldStyle(.roundedBorder)
+                                    .frame(width: 70)
+                                    .onChange(of: clickManager.settings.fixedY) { _, newValue in
+                                        if newValue < 0 { clickManager.settings.fixedY = 0 }
+                                    }
+                            }
+
+                            Button(action: {
+                                clickManager.isPickingPosition = true
+                            }) {
+                                Image(systemName: "location.fill")
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
                 }
             }
-            .pickerStyle(.segmented)
-            .frame(maxWidth: .infinity)
-
-            // Fixed Position Inputs
-            if clickManager.settings.positionMode == .fixedPosition {
-                HStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("X 坐标")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        TextField("", value: $clickManager.settings.fixedX, format: .number)
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 100)
-                            .onChange(of: clickManager.settings.fixedX) { _, newValue in
-                                if newValue < 0 { clickManager.settings.fixedX = 0 }
-                            }
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Y 坐标")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-
-                        TextField("", value: $clickManager.settings.fixedY, format: .number)
-                            .textFieldStyle(.roundedBorder)
-                            .frame(width: 100)
-                            .onChange(of: clickManager.settings.fixedY) { _, newValue in
-                                if newValue < 0 { clickManager.settings.fixedY = 0 }
-                            }
-                    }
-
-                    Spacer()
-
-                    Button(action: {
-                        clickManager.isPickingPosition = true
-                    }) {
-                        Label("选择位置", systemImage: "location.fill")
-                    }
-                    .buttonStyle(.bordered)
-                }
-                .padding(.top, 8)
-            }
+            .background(Color(nsColor: .controlBackgroundColor))
+            .cornerRadius(8)
         }
-        .padding(16)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .cornerRadius(12)
     }
 }
 
@@ -337,108 +334,120 @@ struct HotkeySettingsCard: View {
     @EnvironmentObject var clickManager: ClickManager
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             Label("快捷键", systemImage: "keyboard")
-                .font(.headline)
+                .font(.system(size: 13, weight: .semibold))
 
-            HStack {
-                Text("开始/停止:")
-                    .foregroundColor(.secondary)
+            VStack(spacing: 0) {
+                RowItem(title: "开始/停止", icon: "play.square") {
+                    if clickManager.isRecordingHotKey {
+                        HStack(spacing: 8) {
+                            Text("按下快捷键...")
+                                .font(.system(size: 12))
+                                .foregroundColor(.blue)
 
-                if clickManager.isRecordingHotKey {
-                    Text("按下快捷键...")
-                        .foregroundColor(.blue)
-                } else {
-                    Text(clickManager.hotKeyDisplay)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color(nsColor: .textBackgroundColor))
-                        .cornerRadius(6)
+                            Button("取消") {
+                                clickManager.isRecordingHotKey = false
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    } else {
+                        HStack(spacing: 8) {
+                            Text(clickManager.hotKeyDisplay)
+                                .font(.system(size: 12, weight: .medium))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 4)
+                                .background(Color(nsColor: .textBackgroundColor))
+                                .cornerRadius(4)
+
+                            Button("修改") {
+                                clickManager.isRecordingHotKey = true
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+
+                            Button("重置") {
+                                clickManager.resetHotKey()
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
                 }
 
-                Spacer()
-
                 if clickManager.isRecordingHotKey {
-                    Button("取消") {
-                        clickManager.isRecordingHotKey = false
-                    }
-                    .buttonStyle(.bordered)
-                } else {
-                    Button("修改") {
-                        clickManager.isRecordingHotKey = true
-                    }
-                    .buttonStyle(.bordered)
+                    Divider().padding(.leading, 36)
 
-                    Button("重置") {
-                        clickManager.resetHotKey()
+                    HStack {
+                        Text("请按下您想要使用的快捷键组合")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        Spacer()
                     }
-                    .buttonStyle(.bordered)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
             }
-
-            if clickManager.isRecordingHotKey {
-                Text("请按下您想要使用的快捷键组合")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            .background(Color(nsColor: .controlBackgroundColor))
+            .cornerRadius(8)
         }
-        .padding(16)
-        .background(Color(nsColor: .controlBackgroundColor))
-        .cornerRadius(12)
     }
 }
 
-// MARK: - Control Button
+// MARK: - Row Item
 
-struct ControlButton: View {
-    @EnvironmentObject var clickManager: ClickManager
-
-    var body: some View {
-        Button(action: {
-            if !clickManager.checkAccessibilityPermission() {
-                return
-            }
-            clickManager.toggleClicking()
-        }) {
-            HStack(spacing: 8) {
-                Image(systemName: clickManager.state == .running ? "stop.fill" : "play.fill")
-                    .font(.system(size: 16, weight: .semibold))
-
-                Text(clickManager.state == .running ? "停止自动点击" : "开始自动点击")
-                    .font(.system(size: 15, weight: .semibold))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(clickManager.state == .running ? Color.red : Color.accentColor)
-            .foregroundColor(.white)
-            .cornerRadius(10)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-// MARK: - Setting Row
-
-struct SettingRow<Content: View>: View {
-    let icon: String
+struct RowItem<Content: View>: View {
     let title: String
+    let icon: String
     @ViewBuilder let content: () -> Content
 
     var body: some View {
         HStack {
             Image(systemName: icon)
-                .font(.system(size: 14))
+                .font(.system(size: 12))
                 .foregroundColor(.secondary)
                 .frame(width: 20)
 
             Text(title)
-                .foregroundColor(.secondary)
+                .font(.system(size: 13))
 
             Spacer()
 
             content()
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+    }
+}
+
+// MARK: - Bottom View
+
+struct BottomView: View {
+    @EnvironmentObject var clickManager: ClickManager
+
+    var body: some View {
+        HStack {
+            Spacer()
+
+            Button(action: {
+                if !clickManager.checkAccessibilityPermission() {
+                    return
+                }
+                clickManager.toggleClicking()
+            }) {
+                HStack(spacing: 6) {
+                    Image(systemName: clickManager.state == .running ? "stop.fill" : "play.fill")
+                    Text(clickManager.state == .running ? "停止" : "开始")
+                }
+                .font(.system(size: 13, weight: .medium))
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(clickManager.state == .running ? .red : .accentColor)
+
+            Spacer()
+        }
+        .padding(16)
     }
 }
 
