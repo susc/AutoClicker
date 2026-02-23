@@ -1,6 +1,12 @@
 # AutoClicker
 
-A macOS native auto-clicker application.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/susc/AutoClicker/main/AutoClicker/Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" width="128" height="128" alt="AutoClicker">
+</p>
+
+<p align="center">
+  A native macOS auto-clicker application.
+</p>
 
 ## Screenshot
 
