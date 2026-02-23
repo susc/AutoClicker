@@ -14,6 +14,7 @@
 		A9852DD91D6631996B50C4F7 /* ClickManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9537740595FF14DE5569FA41 /* ClickManager.swift */; };
 		ABA60E7191B9CE5F0E709606 /* ClickSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E6B958F1D081D870FDC99A /* ClickSettings.swift */; };
 		D9869381F03C0C961A591142 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CC210ECAB364581EDEB5B7C9 /* Assets.xcassets */; };
+		F0ECD1FC941AFE454109F936 /* screenshot.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB55D02B40777BE82540785 /* screenshot.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		80B9ED230C1E685B354AD580 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		9537740595FF14DE5569FA41 /* ClickManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickManager.swift; sourceTree = "<group>"; };
 		A18781B0CB69BB034A84CA8A /* AutoClicker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AutoClicker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBB55D02B40777BE82540785 /* screenshot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = screenshot.png; sourceTree = "<group>"; };
 		C7E6B958F1D081D870FDC99A /* ClickSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickSettings.swift; sourceTree = "<group>"; };
 		CC210ECAB364581EDEB5B7C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E1D8060859C264FB5D1CB550 /* PositionPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PositionPicker.swift; sourceTree = "<group>"; };
@@ -44,6 +46,7 @@
 				CC210ECAB364581EDEB5B7C9 /* Assets.xcassets */,
 				FC496E642F0DB8F80E400518 /* AutoClicker.entitlements */,
 				0083B5C19E2B8C0C124679C7 /* Info.plist */,
+				BBB55D02B40777BE82540785 /* screenshot.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -126,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9869381F03C0C961A591142 /* Assets.xcassets in Resources */,
+				F0ECD1FC941AFE454109F936 /* screenshot.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
